@@ -20,7 +20,7 @@ import java.security.MessageDigest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
+import com.illuminated_security.appliedcrypto.Utils;
 import com.illuminated_security.appliedcrypto.hash.HKDF;
 import com.illuminated_security.appliedcrypto.hash.HMAC;
 import com.illuminated_security.appliedcrypto.hash.KeyDerivationFunction;
@@ -43,7 +43,7 @@ public class BearerAuthentication {
     }
 
     public void register(String username, byte[] bearerCredential) {
-        var salt = RandomUtils.secureRandomBytes(16);
+        var salt = Utils.secureRandomBytes(16);
         var digest = kdf.derive(bearerCredential, salt, null, 32);
         hashes.put(username, new UserHash(salt, digest));
     }

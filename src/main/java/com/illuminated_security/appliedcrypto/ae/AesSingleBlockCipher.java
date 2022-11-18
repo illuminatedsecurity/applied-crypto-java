@@ -28,7 +28,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
 import com.illuminated_security.appliedcrypto.Utils;
 
 /**
@@ -38,7 +37,7 @@ import com.illuminated_security.appliedcrypto.Utils;
 public class AesSingleBlockCipher implements CcaSecureCipher {
     @Override
     public byte[] encrypt(SecretKey key, byte[] plaintext) {
-        var key2 = new SecretKeySpec(RandomUtils.secureRandomBytes(16), "AES");
+        var key2 = new SecretKeySpec(Utils.secureRandomBytes(16), "AES");
         byte[] c1 = aes(Cipher.ENCRYPT_MODE, key, key2.getEncoded());
         byte[] c2 = aes(Cipher.ENCRYPT_MODE, key2, plaintext);
         return Utils.concat(c1, c2);

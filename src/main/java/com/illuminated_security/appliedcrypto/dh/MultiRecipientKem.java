@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.illuminated_security.appliedcrypto.rsa;
+package com.illuminated_security.appliedcrypto.dh;
 
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Collection;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
-public interface KeyEncapsulationMechanism {
+import com.illuminated_security.appliedcrypto.rsa.KeyEncapsulationMechanism.EncapsulatedKey;
 
-    KeyPair generateKeyPair();
-
-    EncapsulatedKey encapsulate(PublicKey publicKey, byte[] context);
+public interface MultiRecipientKem {
+    EncapsulatedKey encapsulate(Collection<PublicKey> publicKeys, byte[] context);
     Optional<SecretKey> decapsulate(PrivateKey privateKey, byte[] context, byte[] encapsulatedKey);
-
-    record EncapsulatedKey(SecretKey demKey, byte[] encapsulation) { }
 }

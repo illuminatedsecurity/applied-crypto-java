@@ -16,8 +16,8 @@
 
 package com.illuminated_security.appliedcrypto.rsa;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.nio.charset.StandardCharsets.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -44,8 +44,8 @@ public class RsaKemTest {
     public void testWorks() throws Exception {
         RsaKem kem = new RsaKem(new HKDF(new HMAC("SHA-256")), "AES", "Test".getBytes());
         var encapKey = kem.encapsulate(keyPair.getPublic(), "Test".getBytes(UTF_8));
-        var demKey = kem.decapsulate(keyPair.getPrivate(), "Test".getBytes(UTF_8), encapKey.getEncapsulation())
+        var demKey = kem.decapsulate(keyPair.getPrivate(), "Test".getBytes(UTF_8), encapKey.encapsulation())
                         .orElseThrow();
-        assertThat(demKey).isEqualTo(encapKey.getDemKey());
+        assertThat(demKey).isEqualTo(encapKey.demKey());
     }
 }

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.SecretKey;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
+import com.illuminated_security.appliedcrypto.Utils;
 import com.illuminated_security.appliedcrypto.mac.MessageAuthenticator;
 
 public class MacChallengeResponse implements ChallengeResponseProtocol {
@@ -40,12 +40,12 @@ public class MacChallengeResponse implements ChallengeResponseProtocol {
 
     @Override
     public byte[] challenge(String username) {
-        return RandomUtils.secureRandomBytes(20);
+        return Utils.secureRandomBytes(20);
     }
 
     @Override
     public boolean response(String username, byte[] challenge, byte[] response) {
-        var macKey = macKeys.getOrDefault(username, mac.importKey(RandomUtils.secureRandomBytes(32), 0, 32));
+        var macKey = macKeys.getOrDefault(username, mac.importKey(Utils.secureRandomBytes(32), 0, 32));
         return mac.verify(macKey, challenge, response);
     }
 }

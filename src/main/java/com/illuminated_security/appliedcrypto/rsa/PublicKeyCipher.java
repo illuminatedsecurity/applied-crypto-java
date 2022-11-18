@@ -16,19 +16,11 @@
 
 package com.illuminated_security.appliedcrypto.rsa;
 
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Optional;
 
-import javax.crypto.SecretKey;
-
-public interface KeyEncapsulationMechanism {
-
-    KeyPair generateKeyPair();
-
-    EncapsulatedKey encapsulate(PublicKey publicKey, byte[] context);
-    Optional<SecretKey> decapsulate(PrivateKey privateKey, byte[] context, byte[] encapsulatedKey);
-
-    record EncapsulatedKey(SecretKey demKey, byte[] encapsulation) { }
+public interface PublicKeyCipher {
+    byte[] encrypt(PublicKey publicKey, byte[] plaintext);
+    Optional<byte[]> decrypt(PrivateKey privateKey, byte[] ciphertext);
 }

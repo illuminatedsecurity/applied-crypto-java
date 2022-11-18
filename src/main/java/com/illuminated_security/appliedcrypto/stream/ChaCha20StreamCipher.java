@@ -26,13 +26,12 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
 import com.illuminated_security.appliedcrypto.Utils;
 
 public final class ChaCha20StreamCipher implements CpaSecureCipher {
     @Override
     public byte[] encrypt(SecretKey key, byte[] plaintext) {
-        var nonce = RandomUtils.secureRandomBytes(12);
+        var nonce = Utils.secureRandomBytes(12);
         var ciphertext = process(key, nonce, plaintext);
         return Utils.concat(nonce, ciphertext);
     }

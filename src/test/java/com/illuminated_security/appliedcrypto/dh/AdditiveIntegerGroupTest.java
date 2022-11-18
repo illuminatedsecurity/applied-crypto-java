@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.illuminated_security.appliedcrypto.ec;
+package com.illuminated_security.appliedcrypto.dh;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Collection;
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.*;
 
-import javax.crypto.SecretKey;
+import java.math.BigInteger;
 
-import com.illuminated_security.appliedcrypto.rsa.KeyEncapsulationMechanism.EncapsulatedKey;
+import org.testng.annotations.Test;
 
-public interface MultiRecipientKem {
-    EncapsulatedKey encapsulate(Collection<PublicKey> publicKeys, byte[] context);
-    Optional<SecretKey> decapsulate(PrivateKey privateKey, byte[] context, byte[] encapsulatedKey);
+public class AdditiveIntegerGroupTest {
+
+    @Test
+    public void testScalarOp() {
+        var group = new AdditiveIntegerGroup();
+        var ten = new BigInteger("7");
+        var three = new BigInteger("9");
+        var result = group.scalarOperation(ten, three);
+        assertThat(result).isEqualTo(new BigInteger("63"));
+    }
 }

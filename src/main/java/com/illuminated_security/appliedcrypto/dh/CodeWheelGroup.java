@@ -14,21 +14,29 @@
  * limitations under the License.
  */
 
-package com.illuminated_security.appliedcrypto.rsa;
+package com.illuminated_security.appliedcrypto.dh;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Optional;
+public class CodeWheelGroup implements CyclicGroup<Character> {
+    @Override
+    public Character identityElement() {
+        return 'a';
+    }
 
-import javax.crypto.SecretKey;
+    @Override
+    public Character groupOperation(Character x, Character y) {
+        int a = x - 'a';
+        int b = y - 'a';
+        int c = (a + b) % 26;
+        return (char)(c + 'a');
+    }
 
-public interface KeyEncapsulationMechanism {
+    @Override
+    public Character inverse(Character element) {
+        return (char) (26 - (element - 'a') + 'a');
+    }
 
-    KeyPair generateKeyPair();
-
-    EncapsulatedKey encapsulate(PublicKey publicKey, byte[] context);
-    Optional<SecretKey> decapsulate(PrivateKey privateKey, byte[] context, byte[] encapsulatedKey);
-
-    record EncapsulatedKey(SecretKey demKey, byte[] encapsulation) { }
+    @Override
+    public Character generator() {
+        return 'b';
+    }
 }

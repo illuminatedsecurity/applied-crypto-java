@@ -43,9 +43,9 @@ public class SignedKeyBlobAuthenticatedKemTest {
 
         var encapKey = authKem.encapsulate(sigKeys, kemKeys.getPublic(), "test".getBytes(UTF_8));
         var decapKey = authKem.decapsulate(kemKeys, sigKeys.getPublic(), "test".getBytes(UTF_8),
-                encapKey.getEncapsulation()).orElseThrow();
+                encapKey.encapsulation()).orElseThrow();
 
-        assertThat(decapKey).isEqualTo(encapKey.getDemKey());
+        assertThat(decapKey).isEqualTo(encapKey.demKey());
     }
 
 }

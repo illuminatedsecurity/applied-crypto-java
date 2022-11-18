@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.illuminated_security.appliedcrypto.ec;
+package com.illuminated_security.appliedcrypto.dh;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,30 +22,31 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.NamedParameterSpec;
 import java.util.Collection;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
+import com.illuminated_security.appliedcrypto.Utils;
 import com.illuminated_security.appliedcrypto.ae.KeyWrapCipher;
+import com.illuminated_security.appliedcrypto.hash.HKDF;
+import com.illuminated_security.appliedcrypto.hash.HMAC;
 
-public class MultiRecipientEcies extends EciesKem implements MultiRecipientKem {
+public class MultiRecipientECKem extends DHKem implements MultiRecipientKem {
     private final KeyWrapCipher keyWrap;
 
-    public MultiRecipientEcies(String demAlgorithm, KeyWrapCipher keyWrap)
+    public MultiRecipientECKem(String demAlgorithm, KeyWrapCipher keyWrap)
             throws NoSuchAlgorithmException {
-        super(demAlgorithm);
+        super("X25519", "X25519", NamedParameterSpec.X25519, new HKDF(new HMAC("SHA-512")), new byte[0], demAlgorithm);
         this.keyWrap = keyWrap;
     }
 
     @Override
     public EncapsulatedKey encapsulate(Collection<PublicKey> publicKeys, byte[] context) {
-        var ephemeralKeys = keyPairGenerator.generateKeyPair();
-        var demKey = new SecretKeySpec(RandomUtils.secureRandomBytes(32), demAlgorithm);
+        var ephemeralKeys = generateKeyPair();
+        var demKey = new SecretKeySpec(Utils.secureRandomBytes(32), demAlgorithm);
 
         var out = new ByteArrayOutputStream();
         var epk = ephemeralKeys.getPublic().getEncoded();
@@ -53,7 +54,7 @@ public class MultiRecipientEcies extends EciesKem implements MultiRecipientKem {
         out.writeBytes(epk);
         for (PublicKey recipient : publicKeys) {
             var wrapKey = deriveKey(ephemeralKeys.getPrivate(), recipient,
-                    kdfContext(ephemeralKeys.getPublic(), context));
+                    Utils.concat(ephemeralKeys.getPublic().getEncoded(), context));
             var wrappedKey = keyWrap.wrap(wrapKey, demKey);
             out.write(wrappedKey.length); // As a single byte
             out.writeBytes(wrappedKey);
@@ -68,8 +69,8 @@ public class MultiRecipientEcies extends EciesKem implements MultiRecipientKem {
         try (var in = new ByteArrayInputStream(encapsulatedKey)) {
             int epkLen = in.read();
             var epkBytes = in.readNBytes(epkLen);
-            var epk = keyFactory.generatePublic(new X509EncodedKeySpec(epkBytes));
-            var unwrapKey = deriveKey(privateKey, epk, kdfContext(epk, context));
+            var epk = decodePublicKey(epkBytes);
+            var unwrapKey = deriveKey(privateKey, epk, Utils.concat(encapsulatedKey, context));
 
             int wrappedKeyLen;
             while ((wrappedKeyLen = in.read()) != -1) {
@@ -81,8 +82,6 @@ public class MultiRecipientEcies extends EciesKem implements MultiRecipientKem {
             }
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
-        } catch (InvalidKeySpecException e) {
-            return Optional.empty();
         }
         return Optional.empty();
     }

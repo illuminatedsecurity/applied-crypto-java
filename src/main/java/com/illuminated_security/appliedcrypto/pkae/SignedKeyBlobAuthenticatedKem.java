@@ -43,12 +43,12 @@ public class SignedKeyBlobAuthenticatedKem implements AuthenticatedKem {
         // Include our public signature key in the KDF context to prevent signature stripping attacks
         var contextWithPk = Utils.concat(senderKeys.getPublic().getEncoded(), context);
         var encapsulatedKey = unauthenticatedKem.encapsulate(recipient, contextWithPk);
-        var keyBlob = encapsulatedKey.getEncapsulation();
+        var keyBlob = encapsulatedKey.encapsulation();
         var sig = signature.sign(senderKeys.getPrivate(), keyBlob);
         assert keyBlob.length <= 65535;
         var keyBlobLen = new byte[] { (byte)(keyBlob.length >>> 8 & 0xFF), (byte)(keyBlob.length & 0xFF) };
 
-        return new EncapsulatedKey(encapsulatedKey.getDemKey(), Utils.concat(keyBlobLen, keyBlob, sig));
+        return new EncapsulatedKey(encapsulatedKey.demKey(), Utils.concat(keyBlobLen, keyBlob, sig));
     }
 
     @Override

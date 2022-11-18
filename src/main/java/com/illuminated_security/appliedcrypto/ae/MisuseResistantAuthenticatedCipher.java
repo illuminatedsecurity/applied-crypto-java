@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
-import com.illuminated_security.appliedcrypto.RandomUtils;
 import com.illuminated_security.appliedcrypto.Utils;
 
 public class MisuseResistantAuthenticatedCipher implements AuthenticatedCipherWithAD {
@@ -33,7 +32,7 @@ public class MisuseResistantAuthenticatedCipher implements AuthenticatedCipherWi
 
     @Override
     public byte[] encrypt(SecretKey key, byte[] plaintext, byte[] assocData) {
-        byte[] nonce = RandomUtils.secureRandomBytes(20);
+        byte[] nonce = Utils.secureRandomBytes(20);
         return Utils.concat(nonce, cipher.encrypt(key, plaintext, assocData, nonce));
     }
 

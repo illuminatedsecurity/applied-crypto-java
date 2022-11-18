@@ -17,8 +17,12 @@
 package com.illuminated_security.appliedcrypto.rsa;
 
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,6 +30,16 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public class InsecureRsaEncryption {
+
+    public KeyPair generateKeyPair() {
+        try {
+            var kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(3072);
+            return kpg.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
 
     public byte[] encrypt(PublicKey key, byte[] plaintext) {
         try {
@@ -38,6 +52,22 @@ public class InsecureRsaEncryption {
             throw new AssertionError(e);
         } catch (InvalidKeyException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    private Optional<byte[]> decrypt(PrivateKey key, byte[] ciphertext) {
+        try {
+            var cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            return Optional.of(cipher.doFinal(ciphertext));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (IllegalBlockSizeException e) {
+            throw new AssertionError(e);
+        } catch (InvalidKeyException e) {
+            throw new IllegalArgumentException(e);
+        } catch (BadPaddingException e) {
+            return Optional.empty();
         }
     }
 }

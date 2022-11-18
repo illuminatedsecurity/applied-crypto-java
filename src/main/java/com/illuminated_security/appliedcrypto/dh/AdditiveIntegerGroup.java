@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.illuminated_security.appliedcrypto.rsa;
+package com.illuminated_security.appliedcrypto.dh;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Optional;
+import java.math.BigInteger;
 
-import javax.crypto.SecretKey;
+public class AdditiveIntegerGroup implements CyclicGroup<BigInteger> {
+    @Override
+    public BigInteger identityElement() {
+        return BigInteger.ZERO;
+    }
 
-public interface KeyEncapsulationMechanism {
+    @Override
+    public BigInteger groupOperation(BigInteger x, BigInteger y) {
+        return x.add(y);
+    }
 
-    KeyPair generateKeyPair();
+    @Override
+    public BigInteger inverse(BigInteger element) {
+        return element.negate();
+    }
 
-    EncapsulatedKey encapsulate(PublicKey publicKey, byte[] context);
-    Optional<SecretKey> decapsulate(PrivateKey privateKey, byte[] context, byte[] encapsulatedKey);
-
-    record EncapsulatedKey(SecretKey demKey, byte[] encapsulation) { }
+    @Override
+    public BigInteger generator() {
+        return BigInteger.ONE;
+    }
 }
